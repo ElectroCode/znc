@@ -1063,6 +1063,7 @@ void CIRCSock::Connected() {
 	CString sNick = m_pNetwork->GetNick();
 	CString sIdent = m_pNetwork->GetIdent();
 	CString sRealName = m_pNetwork->GetRealName();
+    CString sUserName = m_pNetwork->GetUser()->GetUserName();
 
 	bool bReturn = false;
 	IRCSOCKMODULECALL(OnIRCRegistration(sPass, sNick, sIdent, sRealName), &bReturn);
@@ -1075,8 +1076,14 @@ void CIRCSock::Connected() {
 	}
 
 	PutIRC("NICK " + sNick);
-	PutIRC("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
+//	PutIRC("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
 
+    // Lock ident for non admin
+    if (!m_pNetwork->GetUser()->IsAdmin()) {
+        PutIRC("USER " + sUserName + " \"" + sUserName + "\" \"" + sUserName + "\" :" + sRealName);
+    } else {
+        PutIRC("USER " + sIdent + " \"" + sIdent + "\" \"" + sIdent + "\" :" + sRealName);
+    }  
 	// SendAltNick() needs this
 	m_Nick.SetNick(sNick);
 }
